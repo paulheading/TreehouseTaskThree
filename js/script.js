@@ -12,17 +12,37 @@ const titleSelect = document.querySelector('#title');
 const designSelect = document.querySelector('#design');
 const colorSelect = document.querySelector('#color');
 const paySelect = document.querySelector('#payment');
+const expSelect = document.querySelector('#exp-year');
 const firstField = document.getElementsByTagName('fieldset')[0];
-const activitiesField = document.querySelector('.activities');
+const activField = document.querySelector('.activities');
 const creditDiv = document.querySelector('#credit-card');
 const payPalDiv = creditDiv.nextElementSibling;
 const bitcoinDiv = payPalDiv.nextElementSibling;
 const form = document.querySelector('form');
 const colorDiv = document.querySelector('#colors-js-puns');
-const newEl = document.createElement('div');
-const ref = firstField.getElementsByTagName('input')[1];
-const yesnoDiv = firstField.appendChild(document.createElement('input'));
-const totalDiv = activitiesField.appendChild(document.createElement('div'));
+const yesnoDiv = document.querySelector('#other-title');
+const totalDiv = activField.appendChild(document.createElement('div'));
+
+const cvv = document.querySelector('#cvv');
+const cvvTest = /^\d{3}$/;
+const zip = document.querySelector('#zip');
+const zipTest = /^\d{5}$/;
+const ccNum = document.querySelector('#cc-num');
+const ccNumTest = /^\d{13,16}$/;
+
+const userError = document.createElement('div');
+const mailError = document.createElement('div');
+const activError = document.createElement('div');
+const ccNumError = document.createElement('div');
+const zipError = document.createElement('div');
+const cvvError = document.createElement('div');
+
+let userEroMsg = "";
+let mailEroMsg = "";
+let activEroMsg = "";
+let ccNumEroMsg = "";
+let zipEroMsg = "";
+let cvvEroMsg = "";
 
 // hiding & creating default objects
 const basicSetup = () => {
@@ -31,11 +51,17 @@ const basicSetup = () => {
   nameInput.focus();
   colorDiv.style.display = 'none';
   yesnoDiv.style.display = 'none';
+  insertAfter(userError,nameInput);
+  insertAfter(mailError,mailInput);
+  insertAfter(activError,activField);
+  insertAfter(cvvError,expSelect);
+  insertAfter(zipError,expSelect);
+  insertAfter(ccNumError,expSelect);
 }
 
 // add email validation after the input field
-const insertAfter = (el,referenceNode) => {
-  referenceNode.parentNode.insertBefore(el,referenceNode.nextSibling);
+const insertAfter = (el,refNode) => {
+  refNode.parentNode.insertBefore(el,refNode.nextSibling);
 }
 
 // display 'pun' options
@@ -76,17 +102,10 @@ const totalCalc = sum => {
   totalDiv.innerHTML = `Total price = $${sum}`;
 }
 
-// setup other job field
-const yesnoSetup = () => {
-  yesnoDiv.setAttribute("id","other-title");
-  yesnoDiv.setAttribute("placeholder","Your Job Role");
-  yesnoDiv.style.display = 'block';
-}
-
 // run & display other job field
 function yesnoCheck() {
   if (this.value == "other") {
-    yesnoSetup()
+    yesnoDiv.style.display = 'block';
   } else {
     yesnoDiv.style.display = 'none';
   }
@@ -119,7 +138,7 @@ const payReset = () => {
 // reset & add classes on payment sub selection
 function payCheck() {
   payReset();
-  if ( this.value == "credit card" || this.value == "select_method" ) {
+  if ( this.value == "credit card" ) {
     creditDiv.style.display = "block";
     creditDiv.classList.add('active');
   } else if ( this.value == "paypal" ) {
@@ -182,51 +201,57 @@ const totalCheck = () => {
   totalCalc(total);
 }
 
-// check form fields are filled out on submit
+// check form fields are filled out on submit, reject form if any error messages are logged
 form.onsubmit = function validateForm() {
-  const userName = document.forms["myForm"]["user_name"].value;
-  const cvv = document.querySelector('#cvv');
-  const cvvTest = /^\d{3}$/;
-  const zip = document.querySelector('#zip');
-  const zipTest = /^\d{5}$/;
-  const ccNum = document.querySelector('#cc-num');
-  const ccNumTest = /^\d{13,16}$/;
+  const userName = document.forms["myForm"]["user_name"];
+  const userEmail = document.forms["myForm"]["user_email"];
 
-  if (userName == "") {
-      alert('Name must be filled out');
-      nameInput.style.border = "1px solid red";
-      return false;
+  if (userName.value == ""){
+      userEroMsg = `Please enter your name`;
+      userError.innerHTML = `${userEroMsg}`;
+      userError.style.marginBottom = '20px';
+      userError.style.color = 'darkRed';
+  }
+  if (userEmail.value == "") {
+      mailEroMsg = `Please enter your email`;
+      mailError.innerHTML = `${mailEroMsg}`;
+      mailError.style.marginBottom = '20px';
+      mailError.style.color = 'darkred';
   }
   if (allInput.checked==false && frameworksInput.checked==false &&
       libsInput.checked==false && expressInput.checked==false &&
       nodeInput.checked==false && buildInput.checked==false &&
       npmInput.checked==false) {
-  		alert('Please register for at least one activity');
-      nameInput.style.border = "none";
-      activitiesField.style.background = "rgba(255,0,0,0.1)";
-  		return false;
-	}
+      activEroMsg = `Please register for at least one activity`;
+      activError.innerHTML = `${activEroMsg}`;
+      activError.style.marginTop = '20px';
+      activError.style.marginLeft = '2px';
+      activError.style.color = 'darkRed';
+  }
   if (creditDiv.classList.contains('active')) {
     if (ccNum.value.match(ccNumTest)) {} else {
-      alert('Card number must contain between 13-16 digits');
-      zip.style.border = "none";
-      ccNum.style.border = "1px solid red";
-      return false;
+      ccNumEroMsg = `Card number must contain between 13-16 digits`;
+      ccNumError.innerHTML = `${ccNumEroMsg}`;
+      ccNumError.style.marginTop = '10px';
+      ccNumError.style.color = 'darkRed';
     }
     if (zip.value.match(zipTest)) {} else {
-      alert('Zip must contain 5 digits');
-      cvv.style.border = "none";
-      zip.style.border = "1px solid red";
-      return false;
+      zipEroMsg = `Zip must contain 5 digits`;
+      zipError.innerHTML = `${zipEroMsg}`;
+      zipError.style.marginTop = '10px';
+      zipError.style.color = 'darkRed';
     }
     if (cvv.value.match(cvvTest)) {} else {
-      alert('CVV must contain 3 digits');
-      activitiesField.style.background = "transparent";
-      cvv.style.border = "1px solid red";
-      return false;
+      cvvEroMsg = `CVV must contain 3 digits`;
+      cvvError.innerHTML = `${cvvEroMsg}`;
+      cvvError.style.marginTop = '10px';
+      cvvError.style.color = 'darkRed';
     }
-    return true;
   }
+  if (userEroMsg != "" || mailEroMsg != "" || activEroMsg != "" || ccNumEroMsg != "" || zipEroMsg != "" || cvvEroMsg != ""){
+    return false;
+  }
+return true;
 }
 
 // dynamically check email field is filled out correctly
@@ -236,34 +261,27 @@ function validateEmail() {
   const dotpos = userEmail.lastIndexOf(".");
 
   if (userEmail == "") {
-      mailInput.style.border = "1px solid red";
-      mailInput.style.marginBottom = "0";
-      insertAfter(newEl,ref);
-      newEl.style.display = "block";
-      newEl.innerHTML = '<p>Please add text</p>';
+      mailError.style.marginBottom = '20px';
+      mailError.style.color = 'darkred';
+      mailError.innerHTML = `Please enter your email`;
       return false;
   }
   if (atpos<1 || dotpos<atpos+2 || dotpos+2>=userEmail.length) {
-      mailInput.style.border = "1px solid red";
-      mailInput.style.marginBottom = "0";
-      insertAfter(newEl,ref);
-      newEl.style.display = "block";
-      newEl.innerHTML = '<p>Please format text</p>';
+      mailError.style.marginBottom = '20px';
+      mailError.style.color = 'darkred';
+      mailError.innerHTML = `Please format your email`;
       return false;
   }
-  mailInput.style.border = "none";
-  mailInput.style.marginBottom = "1.125em";
-  newEl.style.display = "none";
-  return true;
-  }
+return true;
+}
 
 basicSetup();
 totalSetup();
 payReset();
 
 // add listeners to interactive page areas
-titleSelect.addEventListener("change", yesnoCheck);
-designSelect.addEventListener("change", themeCheck);
-activitiesField.addEventListener("change", totalCheck);
-paySelect.addEventListener("change", payCheck);
-ref.addEventListener("keyup", validateEmail);
+titleSelect.addEventListener("change",yesnoCheck);
+designSelect.addEventListener("change",themeCheck);
+activField.addEventListener("change",totalCheck);
+paySelect.addEventListener("change",payCheck);
+mailInput.addEventListener("keyup",validateEmail);

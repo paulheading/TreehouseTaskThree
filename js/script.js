@@ -37,13 +37,6 @@ const ccNumError = document.createElement('div');
 const zipError = document.createElement('div');
 const cvvError = document.createElement('div');
 
-let userEroMsg = "";
-let mailEroMsg = "";
-let activEroMsg = "";
-let ccNumEroMsg = "";
-let zipEroMsg = "";
-let cvvEroMsg = "";
-
 // hiding & creating default objects
 const basicSetup = () => {
   form.setAttribute("name","myForm");
@@ -205,6 +198,12 @@ const totalCheck = () => {
 form.onsubmit = function validateForm() {
   const userName = document.forms["myForm"]["user_name"];
   const userEmail = document.forms["myForm"]["user_email"];
+  let userEroMsg = "";
+  let mailEroMsg = "";
+  let activEroMsg = "";
+  let ccNumEroMsg = "";
+  let zipEroMsg = "";
+  let cvvEroMsg = "";
 
   if (userName.value == ""){
       userEroMsg = `Please enter your name`;
@@ -259,6 +258,7 @@ function validateEmail() {
   const userEmail = document.forms["myForm"]["user_email"].value;
   const atpos = userEmail.indexOf("@");
   const dotpos = userEmail.lastIndexOf(".");
+  let mailEroMsg = "";
 
   if (userEmail == "") {
       mailError.style.marginBottom = '20px';
